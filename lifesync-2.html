@@ -1,0 +1,2253 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeSync – Student Productivity Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root[data-theme="dark"] {
+  --bg: #0d0f1a;
+  --bg2: #131629;
+  --card: #1a1e35;
+  --card2: #1f2440;
+  --border: rgba(255,255,255,0.07);
+  --text: #e8eaf6;
+  --text2: #9095b4;
+  --text3: #5c618a;
+  --accent: #7c6af7;
+  --accent2: #a78bfa;
+  --cyan: #22d3ee;
+  --green: #34d399;
+  --yellow: #fbbf24;
+  --red: #f87171;
+  --pink: #f472b6;
+  --sidebar-w: 240px;
+  --glass: rgba(26,30,53,0.85);
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+:root[data-theme="light"] {
+  --bg: #f0f2ff;
+  --bg2: #e8eaf8;
+  --card: #ffffff;
+  --card2: #f7f8ff;
+  --border: rgba(0,0,0,0.07);
+  --text: #1a1e35;
+  --text2: #5c618a;
+  --text3: #9095b4;
+  --accent: #6c5ce7;
+  --accent2: #8b7cf8;
+  --cyan: #0891b2;
+  --green: #059669;
+  --yellow: #d97706;
+  --red: #dc2626;
+  --pink: #db2777;
+  --sidebar-w: 240px;
+  --glass: rgba(255,255,255,0.9);
+  --shadow: 0 8px 32px rgba(100,100,180,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  transition: background 0.3s, color 0.3s;
+  overflow-x: hidden;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform 0.3s;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-mark {
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--cyan));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.logo-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700; font-size: 18px;
+  background: linear-gradient(135deg, var(--accent2), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.logo-sub { font-size: 10px; color: var(--text3); margin-top: 2px; letter-spacing: 0.05em; }
+
+.sidebar-nav { padding: 16px 12px; flex: 1; }
+.nav-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  color: var(--text3); text-transform: uppercase;
+  padding: 0 8px; margin: 16px 0 8px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px;
+  cursor: pointer; margin-bottom: 2px;
+  transition: all 0.2s; color: var(--text2);
+  font-size: 14px; font-weight: 500;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--card2); color: var(--text); }
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(124,106,247,0.15), rgba(34,211,238,0.08));
+  color: var(--accent2);
+  border: 1px solid rgba(124,106,247,0.2);
+}
+.nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+.user-mini {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px; border-radius: 10px;
+  background: var(--card2); cursor: pointer;
+}
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.user-mini-info { flex: 1; min-width: 0; }
+.user-mini-name { font-size: 13px; font-weight: 600; truncate: ellipsis; }
+.user-mini-role { font-size: 11px; color: var(--text3); }
+
+/* MAIN */
+.main-wrapper {
+  margin-left: var(--sidebar-w);
+  flex: 1; display: flex; flex-direction: column;
+  min-height: 100vh;
+}
+
+/* TOPNAV */
+.topnav {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 28px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+}
+.topnav-search {
+  flex: 1; max-width: 400px;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 14px;
+}
+.topnav-search input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-size: 14px; flex: 1;
+  font-family: 'Inter', sans-serif;
+}
+.topnav-search input::placeholder { color: var(--text3); }
+.topnav-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; color: var(--text2);
+  transition: all 0.2s; position: relative;
+}
+.icon-btn:hover { background: var(--card); color: var(--accent2); border-color: var(--accent); }
+.badge {
+  position: absolute; top: -4px; right: -4px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--red); font-size: 9px; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; border: 2px solid var(--card);
+}
+.theme-toggle {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card2); cursor: pointer;
+  font-size: 13px; color: var(--text2);
+  transition: all 0.2s;
+}
+.theme-toggle:hover { color: var(--text); }
+.topnav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.topnav-user-info { text-align: right; }
+.topnav-user-name { font-size: 13px; font-weight: 600; }
+.topnav-user-time { font-size: 11px; color: var(--text3); }
+
+/* CONTENT */
+.content { padding: 28px; flex: 1; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom: 28px; }
+.page-title { font-family: 'Poppins', sans-serif; font-size: 26px; font-weight: 700; }
+.page-sub { color: var(--text2); font-size: 14px; margin-top: 4px; }
+
+/* KPI GRID */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 24px;
+}
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.kpi-card::before {
+  content: ''; position: absolute;
+  top: 0; right: 0; width: 80px; height: 80px;
+  border-radius: 50%; opacity: 0.07;
+  transform: translate(20px, -20px);
+}
+.kpi-card.purple::before { background: var(--accent); }
+.kpi-card.cyan::before { background: var(--cyan); }
+.kpi-card.green::before { background: var(--green); }
+.kpi-card.yellow::before { background: var(--yellow); }
+.kpi-card.red::before { background: var(--red); }
+.kpi-card.pink::before { background: var(--pink); }
+
+.kpi-label { font-size: 12px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.kpi-val { font-size: 28px; font-weight: 700; margin: 8px 0 4px; font-family: 'Poppins', sans-serif; }
+.kpi-sub { font-size: 12px; color: var(--text2); }
+.kpi-icon {
+  position: absolute; top: 20px; right: 20px;
+  font-size: 22px; opacity: 0.6;
+}
+.kpi-trend {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; padding: 2px 8px; border-radius: 20px;
+  margin-top: 6px;
+}
+.kpi-trend.up { background: rgba(52,211,153,0.12); color: var(--green); }
+.kpi-trend.down { background: rgba(248,113,113,0.12); color: var(--red); }
+
+/* CHARTS ROW */
+.charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px;
+}
+.chart-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.chart-title { font-weight: 600; font-size: 15px; }
+.chart-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.chart-badge {
+  font-size: 11px; padding: 4px 10px; border-radius: 20px;
+  background: rgba(124,106,247,0.12); color: var(--accent2);
+}
+
+/* BOTTOM ROW */
+.bottom-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* TASK MINI */
+.task-mini {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.task-mini:last-child { border-bottom: none; }
+.task-mini-check {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--border); cursor: pointer;
+  flex-shrink: 0; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.task-mini-check.done { background: var(--green); border-color: var(--green); }
+.task-mini-info { flex: 1; }
+.task-mini-name { font-size: 13px; font-weight: 500; }
+.task-mini-name.done { text-decoration: line-through; color: var(--text3); }
+.task-mini-due { font-size: 11px; color: var(--text3); }
+.priority-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.priority-dot.high { background: var(--red); }
+.priority-dot.medium { background: var(--yellow); }
+.priority-dot.low { background: var(--green); }
+
+/* WELLNESS MINI */
+.wellness-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.wellness-icon { font-size: 20px; }
+.wellness-label { font-size: 12px; color: var(--text3); }
+.wellness-val { font-size: 15px; font-weight: 600; }
+.progress-bar-outer {
+  height: 6px; background: var(--bg2); border-radius: 20px; flex: 1;
+}
+.progress-bar-inner {
+  height: 100%; border-radius: 20px;
+  transition: width 0.6s ease;
+}
+
+/* EXAM MINI */
+.exam-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.exam-item:last-child { border-bottom: none; }
+.exam-name { font-size: 14px; font-weight: 600; }
+.exam-sub { font-size: 11px; color: var(--text3); }
+.countdown-badge {
+  font-size: 12px; font-weight: 600;
+  padding: 4px 10px; border-radius: 20px;
+}
+.countdown-badge.urgent { background: rgba(248,113,113,0.12); color: var(--red); }
+.countdown-badge.soon { background: rgba(251,191,36,0.12); color: var(--yellow); }
+.countdown-badge.ok { background: rgba(52,211,153,0.12); color: var(--green); }
+
+/* ===== MODULE: TODO ===== */
+.todo-controls {
+  display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+}
+.search-input {
+  flex: 1; min-width: 200px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px;
+  outline: none; transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.filter-tabs { display: flex; gap: 4px; }
+.filter-tab {
+  padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  font-size: 13px; font-weight: 500; border: 1px solid transparent;
+  transition: all 0.2s; color: var(--text2);
+  background: var(--card);
+}
+.filter-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary {
+  padding: 10px 20px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; font-weight: 600; font-size: 14px;
+  border: none; cursor: pointer; transition: opacity 0.2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary {
+  padding: 9px 16px; border-radius: 10px;
+  background: var(--card2); color: var(--text2);
+  border: 1px solid var(--border); cursor: pointer;
+  font-size: 13px; font-weight: 500; transition: all 0.2s;
+}
+.btn-secondary:hover { color: var(--text); }
+
+.tasks-grid { display: flex; flex-direction: column; gap: 10px; }
+.task-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px 20px;
+  display: flex; align-items: center; gap: 14px;
+  transition: all 0.2s;
+}
+.task-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.task-checkbox {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--border); cursor: pointer;
+  flex-shrink: 0; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+.task-checkbox.done { background: var(--green); border-color: var(--green); color: #fff; }
+.task-info { flex: 1; }
+.task-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+.task-name.done { text-decoration: line-through; color: var(--text3); }
+.task-meta { display: flex; align-items: center; gap: 10px; }
+.priority-tag {
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+}
+.priority-tag.high { background: rgba(248,113,113,0.12); color: var(--red); }
+.priority-tag.medium { background: rgba(251,191,36,0.12); color: var(--yellow); }
+.priority-tag.low { background: rgba(52,211,153,0.12); color: var(--green); }
+.task-due { font-size: 12px; color: var(--text3); }
+.task-actions { display: flex; gap: 6px; }
+.task-action-btn {
+  width: 30px; height: 30px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--card2);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: var(--text3); transition: all 0.2s;
+}
+.task-action-btn:hover { color: var(--text); background: var(--bg2); }
+
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+  z-index: 1000; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 28px; width: 480px; max-width: 95vw;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.modal-title { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 18px; }
+.modal-close { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 20px; }
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; }
+.form-control {
+  width: 100%; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px;
+  outline: none; transition: border-color 0.2s;
+}
+.form-control:focus { border-color: var(--accent); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
+
+/* ===== MODULE: STUDY PLANNER ===== */
+.tabs-row { display: flex; gap: 4px; margin-bottom: 24px; background: var(--card); border-radius: 12px; padding: 4px; width: fit-content; }
+.tab-btn {
+  padding: 8px 16px; border-radius: 8px; cursor: pointer;
+  font-size: 13px; font-weight: 500; border: none;
+  background: none; color: var(--text2); transition: all 0.2s;
+}
+.tab-btn.active { background: var(--accent); color: #fff; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.timetable-grid {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden; margin-bottom: 24px;
+}
+.tt-header { display: grid; grid-template-columns: 80px repeat(5, 1fr); background: var(--card2); }
+.tt-cell {
+  padding: 12px 10px; font-size: 12px; font-weight: 600;
+  color: var(--text3); text-align: center; text-transform: uppercase;
+  border-right: 1px solid var(--border);
+}
+.tt-row { display: grid; grid-template-columns: 80px repeat(5, 1fr); border-top: 1px solid var(--border); }
+.tt-time {
+  padding: 14px 10px; font-size: 11px; color: var(--text3);
+  text-align: center; border-right: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+}
+.tt-slot {
+  padding: 6px; border-right: 1px solid var(--border);
+  min-height: 56px;
+}
+.tt-class {
+  background: linear-gradient(135deg, rgba(124,106,247,0.15), rgba(124,106,247,0.08));
+  border: 1px solid rgba(124,106,247,0.25);
+  border-radius: 8px; padding: 6px 8px; height: 100%;
+}
+.tt-class-name { font-size: 12px; font-weight: 600; color: var(--accent2); }
+.tt-class-room { font-size: 10px; color: var(--text3); }
+.tt-class.cyan { background: linear-gradient(135deg, rgba(34,211,238,0.12), rgba(34,211,238,0.06)); border-color: rgba(34,211,238,0.2); }
+.tt-class.cyan .tt-class-name { color: var(--cyan); }
+.tt-class.green { background: linear-gradient(135deg, rgba(52,211,153,0.12), rgba(52,211,153,0.06)); border-color: rgba(52,211,153,0.2); }
+.tt-class.green .tt-class-name { color: var(--green); }
+.tt-class.pink { background: linear-gradient(135deg, rgba(244,114,182,0.12), rgba(244,114,182,0.06)); border-color: rgba(244,114,182,0.2); }
+.tt-class.pink .tt-class-name { color: var(--pink); }
+
+.assignments-grid { display: flex; flex-direction: column; gap: 10px; }
+.assignment-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.subject-badge {
+  padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  flex-shrink: 0;
+}
+.asgn-info { flex: 1; }
+.asgn-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.asgn-deadline { font-size: 12px; color: var(--text3); }
+.status-badge {
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+}
+.status-badge.pending { background: rgba(251,191,36,0.12); color: var(--yellow); }
+.status-badge.done { background: rgba(52,211,153,0.12); color: var(--green); }
+.status-badge.late { background: rgba(248,113,113,0.12); color: var(--red); }
+
+.attendance-table {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+}
+.att-header {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
+  background: var(--card2); padding: 12px 20px;
+  font-size: 12px; font-weight: 600; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.att-row {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
+  padding: 14px 20px; border-top: 1px solid var(--border);
+  align-items: center;
+}
+.att-subject { font-size: 14px; font-weight: 500; }
+.att-num { font-size: 14px; text-align: center; }
+.att-pct {
+  font-size: 14px; font-weight: 700; text-align: center;
+}
+.att-pct.good { color: var(--green); }
+.att-pct.warn { color: var(--yellow); }
+.att-pct.danger { color: var(--red); }
+
+.notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.note-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px;
+  transition: all 0.2s; cursor: pointer;
+}
+.note-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.note-tag {
+  font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+  margin-bottom: 10px; display: inline-block;
+  background: rgba(124,106,247,0.12); color: var(--accent2);
+}
+.note-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.note-preview { font-size: 12px; color: var(--text3); line-height: 1.6; }
+.note-date { font-size: 11px; color: var(--text3); margin-top: 10px; }
+
+/* ===== MODULE: EXPENSES ===== */
+.expense-summary {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;
+}
+.exp-chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.transactions-list { display: flex; flex-direction: column; gap: 8px; }
+.txn {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 18px;
+  transition: all 0.2s;
+}
+.txn:hover { transform: translateX(4px); }
+.txn-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  flex-shrink: 0;
+}
+.txn-info { flex: 1; }
+.txn-name { font-size: 14px; font-weight: 600; }
+.txn-cat { font-size: 12px; color: var(--text3); }
+.txn-date { font-size: 12px; color: var(--text3); }
+.txn-amount { font-size: 16px; font-weight: 700; }
+.txn-amount.expense { color: var(--red); }
+
+/* ===== MODULE: WELLNESS ===== */
+.mood-row { display: flex; gap: 12px; margin-bottom: 24px; }
+.mood-btn {
+  flex: 1; padding: 16px 10px; border-radius: 14px;
+  border: 2px solid var(--border); background: var(--card);
+  cursor: pointer; text-align: center; transition: all 0.2s;
+}
+.mood-btn:hover { border-color: var(--accent); }
+.mood-btn.active { border-color: var(--accent); background: rgba(124,106,247,0.1); }
+.mood-emoji { font-size: 28px; display: block; margin-bottom: 6px; }
+.mood-label { font-size: 12px; color: var(--text2); font-weight: 500; }
+.wellness-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.wellness-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 22px;
+}
+.wellness-card-title { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
+.big-stat { font-size: 40px; font-weight: 700; font-family: 'Poppins', sans-serif; }
+.big-stat-unit { font-size: 16px; color: var(--text3); font-weight: 400; }
+.sleep-bars { display: flex; gap: 6px; align-items: flex-end; height: 60px; margin-top: 12px; }
+.sleep-bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.sleep-bar {
+  width: 100%; border-radius: 4px 4px 0 0;
+  background: linear-gradient(to top, var(--accent), var(--accent2));
+  min-height: 4px; transition: height 0.5s ease;
+}
+.sleep-bar-day { font-size: 10px; color: var(--text3); }
+.water-cups { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.water-cup {
+  font-size: 22px; cursor: pointer; transition: all 0.2s; opacity: 0.3;
+}
+.water-cup.filled { opacity: 1; }
+.period-info { text-align: center; padding: 10px 0; }
+.period-days { font-size: 48px; font-weight: 800; font-family: 'Poppins', sans-serif; color: var(--pink); }
+.period-label { font-size: 13px; color: var(--text3); margin-top: 4px; }
+.period-date { font-size: 14px; font-weight: 600; margin-top: 10px; }
+.cycle-dots { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 14px; justify-content: center; }
+.cycle-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+.cycle-dot.period { background: var(--pink); }
+.cycle-dot.fertile { background: var(--cyan); }
+.cycle-dot.today { background: var(--yellow); border: 2px solid var(--text); }
+
+/* ===== MODULE: READING ===== */
+.books-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.book-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden; transition: all 0.2s;
+}
+.book-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.book-cover {
+  height: 140px; display: flex; align-items: center; justify-content: center;
+  font-size: 48px; position: relative;
+}
+.book-status-label {
+  position: absolute; top: 10px; right: 10px;
+  font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+}
+.book-status-label.reading { background: rgba(124,106,247,0.9); color: #fff; }
+.book-status-label.done { background: rgba(52,211,153,0.9); color: #fff; }
+.book-status-label.wish { background: rgba(251,191,36,0.9); color: #fff; }
+.book-body { padding: 16px; }
+.book-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.book-author { font-size: 12px; color: var(--text3); margin-bottom: 12px; }
+.book-progress-row { display: flex; align-items: center; gap: 10px; }
+.book-progress-bar { flex: 1; height: 6px; background: var(--bg2); border-radius: 20px; }
+.book-progress-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.book-pct { font-size: 12px; font-weight: 700; color: var(--accent2); }
+.reading-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+
+/* BADGES */
+.badges-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px; }
+.badge-item {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px 20px;
+  display: flex; align-items: center; gap: 12px;
+  transition: all 0.2s;
+}
+.badge-item.earned { border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.05); }
+.badge-emoji { font-size: 28px; }
+.badge-name { font-size: 13px; font-weight: 700; }
+.badge-desc { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.badge-item.locked { opacity: 0.4; }
+
+/* PRODUCTIVITY SCORE */
+.prod-score-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 28px;
+  text-align: center; margin-bottom: 24px;
+  position: relative; overflow: hidden;
+}
+.prod-score-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(124,106,247,0.08), transparent 70%);
+}
+.prod-score-ring { position: relative; display: inline-block; margin-bottom: 20px; }
+.prod-score-num {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-family: 'Poppins', sans-serif; font-size: 36px; font-weight: 800;
+}
+.prod-score-label { font-size: 13px; color: var(--text3); margin-top: -8px; }
+.prod-breakdown { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 24px; }
+.prod-item { text-align: center; }
+.prod-item-val { font-size: 20px; font-weight: 700; }
+.prod-item-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* SETTINGS */
+.settings-section { margin-bottom: 28px; }
+.settings-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-info-label { font-size: 14px; font-weight: 500; }
+.settings-info-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.toggle {
+  width: 44px; height: 24px; border-radius: 12px;
+  background: var(--border); cursor: pointer;
+  position: relative; transition: background 0.2s;
+}
+.toggle.on { background: var(--accent); }
+.toggle::after {
+  content: ''; position: absolute;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; top: 3px; left: 3px;
+  transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(20px); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--card); border: 1px solid var(--accent);
+  border-radius: 12px; padding: 14px 20px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: var(--shadow); z-index: 9999;
+  animation: slideUp 0.3s ease;
+  transition: opacity 0.3s; font-size: 14px;
+}
+.toast.hidden { opacity: 0; pointer-events: none; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--text3);
+}
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-title { font-size: 16px; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
+.empty-sub { font-size: 14px; }
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+  .notes-grid { grid-template-columns: repeat(2, 1fr); }
+  .books-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 960px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-row { grid-template-columns: 1fr; }
+  .bottom-row { grid-template-columns: 1fr; }
+  .exp-chart-row { grid-template-columns: 1fr; }
+  .wellness-grid { grid-template-columns: 1fr; }
+  .prod-breakdown { grid-template-columns: repeat(3, 1fr); }
+  .reading-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main-wrapper { margin-left: 0; }
+  .content { padding: 16px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .mood-row { flex-wrap: wrap; }
+  .mood-btn { flex: 0 0 calc(33.333% - 8px); }
+  .expense-summary { grid-template-columns: 1fr 1fr; }
+  .att-header, .att-row { grid-template-columns: 2fr 1fr 1fr 1fr; }
+  .att-header > *:last-child, .att-row > *:last-child { display: none; }
+  .form-row { grid-template-columns: 1fr; }
+  .notes-grid { grid-template-columns: 1fr; }
+  .books-grid { grid-template-columns: 1fr; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Mobile menu btn */
+.mobile-menu-btn {
+  display: none; background: none; border: none;
+  color: var(--text); font-size: 22px; cursor: pointer;
+}
+@media (max-width: 768px) { .mobile-menu-btn { display: block; } }
+
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 90;
+}
+.sidebar-overlay.open { display: block; }
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, var(--card2) 25%, var(--border) 50%, var(--card2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+select.form-control { appearance: none; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR OVERLAY (MOBILE) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <div class="logo-text">LifeSync</div>
+        <div class="logo-sub">Student Hub</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <button class="nav-item active" onclick="navigate('dashboard', this)">
+      <span class="icon">🏠</span> Dashboard
+    </button>
+    <div class="nav-section-label">Productivity</div>
+    <button class="nav-item" onclick="navigate('todo', this)">
+      <span class="icon">✅</span> To-Do List
+    </button>
+    <button class="nav-item" onclick="navigate('study', this)">
+      <span class="icon">📚</span> Study Planner
+    </button>
+    <div class="nav-section-label">Finance</div>
+    <button class="nav-item" onclick="navigate('expenses', this)">
+      <span class="icon">💰</span> Expenses
+    </button>
+    <div class="nav-section-label">Wellness</div>
+    <button class="nav-item" onclick="navigate('wellness', this)">
+      <span class="icon">🌿</span> Wellness
+    </button>
+    <div class="nav-section-label">Learning</div>
+    <button class="nav-item" onclick="navigate('reading', this)">
+      <span class="icon">📖</span> Reading Tracker
+    </button>
+    <div class="nav-section-label">System</div>
+    <button class="nav-item" onclick="navigate('settings', this)">
+      <span class="icon">⚙️</span> Settings
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-mini">
+      <div class="avatar">A</div>
+      <div class="user-mini-info">
+        <div class="user-mini-name">Shruti</div>
+        <div class="user-mini-role">CSE – Cyber Security</div>
+      </div>
+      <span style="color:var(--text3);font-size:14px;">⋮</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrapper">
+  <!-- TOP NAV -->
+  <header class="topnav">
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+    <div class="topnav-search">
+      <span style="color:var(--text3)">🔍</span>
+      <input type="text" placeholder="Search tasks, notes, books...">
+    </div>
+    <div class="topnav-actions">
+      <button class="icon-btn" title="Notifications">
+        🔔<span class="badge">3</span>
+      </button>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">
+        🌙 Dark
+      </button>
+      <div class="topnav-user">
+        <div class="topnav-user-info">
+          <div class="topnav-user-name">Shruti</div>
+          <div class="topnav-user-time" id="currentTime"></div>
+        </div>
+        <div class="avatar">A</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title">Good morning, Shruti 👋</div>
+        <div class="page-sub">Here's your productivity snapshot for today</div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card purple">
+          <div class="kpi-icon">✅</div>
+          <div class="kpi-label">Tasks Completed</div>
+          <div class="kpi-val">5<span style="font-size:18px;color:var(--text3)">/8</span></div>
+          <div class="kpi-sub">62.5% done today</div>
+          <span class="kpi-trend up">↑ 2 more than yesterday</span>
+        </div>
+        <div class="kpi-card cyan">
+          <div class="kpi-icon">📚</div>
+          <div class="kpi-label">Study Hours</div>
+          <div class="kpi-val">3<span style="font-size:18px;color:var(--text3)"> hrs</span></div>
+          <div class="kpi-sub">Target: 5 hrs</div>
+          <span class="kpi-trend down">↓ 1hr below target</span>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-icon">📖</div>
+          <div class="kpi-label">Reading Progress</div>
+          <div class="kpi-val">70<span style="font-size:18px;color:var(--text3)">%</span></div>
+          <div class="kpi-sub">Atomic Habits</div>
+          <span class="kpi-trend up">↑ 10% this week</span>
+        </div>
+        <div class="kpi-card yellow">
+          <div class="kpi-icon">🔥</div>
+          <div class="kpi-label">Productivity Streak</div>
+          <div class="kpi-val">5<span style="font-size:18px;color:var(--text3)"> days</span></div>
+          <div class="kpi-sub">Keep it going!</div>
+          <span class="kpi-trend up">↑ Personal best!</span>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-icon">🎓</div>
+          <div class="kpi-label">Attendance</div>
+          <div class="kpi-val">82<span style="font-size:18px;color:var(--text3)">%</span></div>
+          <div class="kpi-sub">Avg across subjects</div>
+          <span class="kpi-trend down">↓ Needs attention</span>
+        </div>
+        <div class="kpi-card pink">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-label">Monthly Expenses</div>
+          <div class="kpi-val">₹4.2<span style="font-size:18px;color:var(--text3)">k</span></div>
+          <div class="kpi-sub">Budget: ₹6,000</div>
+          <span class="kpi-trend up">↑ Under budget</span>
+        </div>
+        <div class="kpi-card cyan">
+          <div class="kpi-icon">💧</div>
+          <div class="kpi-label">Water Intake</div>
+          <div class="kpi-val">5<span style="font-size:18px;color:var(--text3)">/8</span></div>
+          <div class="kpi-sub">glasses today</div>
+          <span class="kpi-trend down">↓ 3 more to go</span>
+        </div>
+        <div class="kpi-card purple">
+          <div class="kpi-icon">⏳</div>
+          <div class="kpi-label">Pending Tasks</div>
+          <div class="kpi-val">3</div>
+          <div class="kpi-sub">Due today</div>
+          <span class="kpi-trend down">↓ Action needed</span>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Weekly Productivity</div>
+              <div class="chart-sub">Tasks & Study hours this week</div>
+            </div>
+            <span class="chart-badge">This Week</span>
+          </div>
+          <canvas id="weeklyChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Expense Split</div>
+              <div class="chart-sub">June 2025</div>
+            </div>
+          </div>
+          <canvas id="expensePieSmall" height="180"></canvas>
+        </div>
+      </div>
+
+      <!-- Bottom Widgets -->
+      <div class="bottom-row">
+        <!-- Today's Tasks -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-title">Today's Tasks</div>
+            <button class="btn-primary" style="font-size:12px;padding:6px 12px" onclick="navigate('todo', document.querySelector('[onclick*=todo]'))">View All</button>
+          </div>
+          <div id="dashTasks"></div>
+        </div>
+
+        <!-- Wellness Summary -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-title">Wellness Today</div>
+          </div>
+          <div class="wellness-row">
+            <span class="wellness-icon">😊</span>
+            <div style="flex:1">
+              <div class="wellness-label">Mood</div>
+              <div class="wellness-val">Happy</div>
+            </div>
+          </div>
+          <div class="wellness-row">
+            <span class="wellness-icon">😴</span>
+            <div style="flex:1">
+              <div class="wellness-label">Sleep</div>
+              <div class="wellness-val">7.5 hrs</div>
+            </div>
+            <div class="progress-bar-outer" style="flex:1">
+              <div class="progress-bar-inner" style="width:75%;background:var(--accent)"></div>
+            </div>
+          </div>
+          <div class="wellness-row">
+            <span class="wellness-icon">💧</span>
+            <div style="flex:1">
+              <div class="wellness-label">Hydration</div>
+              <div class="wellness-val">5/8 glasses</div>
+            </div>
+            <div class="progress-bar-outer" style="flex:1">
+              <div class="progress-bar-inner" style="width:62%;background:var(--cyan)"></div>
+            </div>
+          </div>
+          <div class="wellness-row">
+            <span class="wellness-icon">🌸</span>
+            <div style="flex:1">
+              <div class="wellness-label">Next Period</div>
+              <div class="wellness-val" style="color:var(--pink)">In 12 days</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Exams -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-title">Upcoming Exams</div>
+          </div>
+          <div class="exam-item">
+            <div>
+              <div class="exam-name">Mathematics</div>
+              <div class="exam-sub">Unit 3 – Calculus</div>
+            </div>
+            <span class="countdown-badge urgent">12 days</span>
+          </div>
+          <div class="exam-item">
+            <div>
+              <div class="exam-name">Digital Forensics</div>
+              <div class="exam-sub">Practical Viva</div>
+            </div>
+            <span class="countdown-badge soon">18 days</span>
+          </div>
+          <div class="exam-item">
+            <div>
+              <div class="exam-name">Web Development</div>
+              <div class="exam-sub">Project Submission</div>
+            </div>
+            <span class="countdown-badge ok">25 days</span>
+          </div>
+          <div class="exam-item">
+            <div>
+              <div class="exam-name">DBMS</div>
+              <div class="exam-sub">End Semester</div>
+            </div>
+            <span class="countdown-badge ok">32 days</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TODO ===== -->
+    <div class="page" id="page-todo">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="page-title">To-Do List</div>
+            <div class="page-sub">Manage your tasks and priorities</div>
+          </div>
+          <button class="btn-primary" onclick="openModal('task')">+ Add Task</button>
+        </div>
+      </div>
+      <div class="todo-controls">
+        <input class="search-input" type="text" placeholder="🔍  Search tasks..." id="taskSearch" oninput="renderTasks()">
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setFilter('all',this)">All</button>
+          <button class="filter-tab" onclick="setFilter('pending',this)">Pending</button>
+          <button class="filter-tab" onclick="setFilter('done',this)">Done</button>
+          <button class="filter-tab" onclick="setFilter('high',this)">High</button>
+        </div>
+      </div>
+      <div class="tasks-grid" id="tasksContainer"></div>
+    </div>
+
+    <!-- ===== STUDY PLANNER ===== -->
+    <div class="page" id="page-study">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="page-title">Study Planner</div>
+            <div class="page-sub">Timetable, assignments, and attendance</div>
+          </div>
+          <button class="btn-primary" onclick="openModal('assign')">+ Add Assignment</button>
+        </div>
+      </div>
+      <div class="tabs-row">
+        <button class="tab-btn active" onclick="switchTab('timetable',this)">Timetable</button>
+        <button class="tab-btn" onclick="switchTab('assignments',this)">Assignments</button>
+        <button class="tab-btn" onclick="switchTab('attendance',this)">Attendance</button>
+        <button class="tab-btn" onclick="switchTab('notes',this)">Notes</button>
+      </div>
+
+      <!-- Timetable -->
+      <div class="tab-content active" id="tab-timetable">
+        <div class="timetable-grid">
+          <div class="tt-header">
+            <div class="tt-cell">Time</div>
+            <div class="tt-cell">Mon</div>
+            <div class="tt-cell">Tue</div>
+            <div class="tt-cell">Wed</div>
+            <div class="tt-cell">Thu</div>
+            <div class="tt-cell">Fri</div>
+          </div>
+          <div class="tt-row">
+            <div class="tt-time">9:00</div>
+            <div class="tt-slot"><div class="tt-class"><div class="tt-class-name">DBMS</div><div class="tt-class-room">LH-3</div></div></div>
+            <div class="tt-slot"></div>
+            <div class="tt-slot"><div class="tt-class cyan"><div class="tt-class-name">Networks</div><div class="tt-class-room">LH-1</div></div></div>
+            <div class="tt-slot"></div>
+            <div class="tt-slot"><div class="tt-class green"><div class="tt-class-name">Math</div><div class="tt-class-room">LH-2</div></div></div>
+          </div>
+          <div class="tt-row">
+            <div class="tt-time">11:00</div>
+            <div class="tt-slot"><div class="tt-class green"><div class="tt-class-name">Math</div><div class="tt-class-room">LH-2</div></div></div>
+            <div class="tt-slot"><div class="tt-class"><div class="tt-class-name">Forensics</div><div class="tt-class-room">Lab-1</div></div></div>
+            <div class="tt-slot"></div>
+            <div class="tt-slot"><div class="tt-class pink"><div class="tt-class-name">Web Dev</div><div class="tt-class-room">Lab-2</div></div></div>
+            <div class="tt-slot"></div>
+          </div>
+          <div class="tt-row">
+            <div class="tt-time">2:00</div>
+            <div class="tt-slot"></div>
+            <div class="tt-slot"><div class="tt-class cyan"><div class="tt-class-name">Networks</div><div class="tt-class-room">LH-1</div></div></div>
+            <div class="tt-slot"><div class="tt-class pink"><div class="tt-class-name">Web Dev</div><div class="tt-class-room">Lab-2</div></div></div>
+            <div class="tt-slot"><div class="tt-class"><div class="tt-class-name">DBMS</div><div class="tt-class-room">LH-3</div></div></div>
+            <div class="tt-slot"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assignments -->
+      <div class="tab-content" id="tab-assignments">
+        <div class="assignments-grid" id="assignmentsContainer"></div>
+      </div>
+
+      <!-- Attendance -->
+      <div class="tab-content" id="tab-attendance">
+        <div class="attendance-table">
+          <div class="att-header">
+            <div>Subject</div>
+            <div style="text-align:center">Total</div>
+            <div style="text-align:center">Present</div>
+            <div style="text-align:center">%</div>
+            <div>Progress</div>
+          </div>
+          <div class="att-row">
+            <div class="att-subject">Mathematics</div>
+            <div class="att-num">30</div>
+            <div class="att-num">27</div>
+            <div class="att-pct good">90%</div>
+            <div><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:90%;background:var(--green)"></div></div></div>
+          </div>
+          <div class="att-row">
+            <div class="att-subject">DBMS</div>
+            <div class="att-num">28</div>
+            <div class="att-num">22</div>
+            <div class="att-pct warn">78%</div>
+            <div><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:78%;background:var(--yellow)"></div></div></div>
+          </div>
+          <div class="att-row">
+            <div class="att-subject">Digital Forensics</div>
+            <div class="att-num">25</div>
+            <div class="att-num">23</div>
+            <div class="att-pct good">92%</div>
+            <div><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:92%;background:var(--green)"></div></div></div>
+          </div>
+          <div class="att-row">
+            <div class="att-subject">Computer Networks</div>
+            <div class="att-num">32</div>
+            <div class="att-num">22</div>
+            <div class="att-pct danger">68%</div>
+            <div><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:68%;background:var(--red)"></div></div></div>
+          </div>
+          <div class="att-row">
+            <div class="att-subject">Web Development</div>
+            <div class="att-num">20</div>
+            <div class="att-num">18</div>
+            <div class="att-pct good">90%</div>
+            <div><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:90%;background:var(--green)"></div></div></div>
+          </div>
+        </div>
+        <p style="margin-top:12px;font-size:12px;color:var(--red)">⚠️ Computer Networks attendance is below 75%. Please attend upcoming classes.</p>
+      </div>
+
+      <!-- Notes -->
+      <div class="tab-content" id="tab-notes">
+        <div style="margin-bottom:16px;display:flex;justify-content:flex-end">
+          <button class="btn-primary" onclick="openModal('note')">+ New Note</button>
+        </div>
+        <div class="notes-grid" id="notesContainer"></div>
+      </div>
+    </div>
+
+    <!-- ===== EXPENSES ===== -->
+    <div class="page" id="page-expenses">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="page-title">Expense Tracker</div>
+            <div class="page-sub">Monitor your monthly spending</div>
+          </div>
+          <button class="btn-primary" onclick="openModal('expense')">+ Add Expense</button>
+        </div>
+      </div>
+      <div class="expense-summary">
+        <div class="kpi-card purple">
+          <div class="kpi-label">Total Spent</div>
+          <div class="kpi-val" style="font-size:22px">₹4,230</div>
+          <div class="kpi-sub">June 2025</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-label">Remaining Budget</div>
+          <div class="kpi-val" style="font-size:22px">₹1,770</div>
+          <div class="kpi-sub">of ₹6,000</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-label">Largest Category</div>
+          <div class="kpi-val" style="font-size:22px">🍕 Food</div>
+          <div class="kpi-sub">₹1,800 spent</div>
+        </div>
+        <div class="kpi-card cyan">
+          <div class="kpi-label">Transactions</div>
+          <div class="kpi-val" style="font-size:22px" id="txnCount">0</div>
+          <div class="kpi-sub">this month</div>
+        </div>
+      </div>
+      <div class="exp-chart-row">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-title">Monthly Spending</div>
+            <div class="chart-sub">Last 6 months</div>
+          </div>
+          <canvas id="monthlyExpChart" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-title">Category Breakdown</div>
+          </div>
+          <canvas id="expPieChart" height="200"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-title">Recent Transactions</div>
+          <span class="chart-badge" id="txnCountBadge">0 records</span>
+        </div>
+        <div class="transactions-list" id="transactionsContainer"></div>
+      </div>
+    </div>
+
+    <!-- ===== WELLNESS ===== -->
+    <div class="page" id="page-wellness">
+      <div class="page-header">
+        <div class="page-title">Wellness & Period Tracker</div>
+        <div class="page-sub">Track your mood, sleep, hydration, and cycle</div>
+      </div>
+
+      <!-- Mood -->
+      <div class="chart-card" style="margin-bottom:24px">
+        <div class="chart-card-header">
+          <div class="chart-title">How are you feeling today?</div>
+        </div>
+        <div class="mood-row">
+          <div class="mood-btn active" onclick="selectMood(this,'Happy')"><span class="mood-emoji">😊</span><div class="mood-label">Happy</div></div>
+          <div class="mood-btn" onclick="selectMood(this,'Calm')"><span class="mood-emoji">😌</span><div class="mood-label">Calm</div></div>
+          <div class="mood-btn" onclick="selectMood(this,'Stressed')"><span class="mood-emoji">😰</span><div class="mood-label">Stressed</div></div>
+          <div class="mood-btn" onclick="selectMood(this,'Tired')"><span class="mood-emoji">😴</span><div class="mood-label">Tired</div></div>
+          <div class="mood-btn" onclick="selectMood(this,'Excited')"><span class="mood-emoji">🤩</span><div class="mood-label">Excited</div></div>
+        </div>
+      </div>
+
+      <div class="wellness-grid">
+        <!-- Sleep -->
+        <div class="wellness-card">
+          <div class="wellness-card-title">💤 Sleep Tracker</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <div class="big-stat">7.5</div>
+            <div class="big-stat-unit">hrs last night</div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">Weekly avg: 7.1 hrs</div>
+          <div class="sleep-bars">
+            <div class="sleep-bar-item"><div class="sleep-bar" style="height:52px"></div><div class="sleep-bar-day">M</div></div>
+            <div class="sleep-bar-item"><div class="sleep-bar" style="height:45px"></div><div class="sleep-bar-day">T</div></div>
+            <div class="sleep-bar-item"><div class="sleep-bar" style="height:60px;background:linear-gradient(to top,var(--cyan),var(--accent2))"></div><div class="sleep-bar-day">W</div></div>
+            <div class="sleep-bar-item"><div class="sleep-bar" style="height:38px"></div><div class="sleep-bar-day">T</div></div>
+            <div class="sleep-bar-item"><div class="sleep-bar" style="height:55px"></div><div class="sleep-bar-day">F</div></div>
+            <div class="sleep-bar-item"><div class="sleep-bar" style="height:68px;background:linear-gradient(to top,var(--green),var(--cyan))"></div><div class="sleep-bar-day">S</div></div>
+            <div class="sleep-bar-item"><div class="sleep-bar" style="height:50px"></div><div class="sleep-bar-day">S</div></div>
+          </div>
+        </div>
+
+        <!-- Water -->
+        <div class="wellness-card">
+          <div class="wellness-card-title">💧 Water Intake</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <div class="big-stat" id="waterCount">5</div>
+            <div class="big-stat-unit">/ 8 glasses</div>
+          </div>
+          <div class="water-cups" id="waterCups"></div>
+          <div style="margin-top:14px">
+            <div class="progress-bar-outer">
+              <div class="progress-bar-inner" id="waterBar" style="width:62%;background:linear-gradient(90deg,var(--cyan),var(--accent))"></div>
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-top:6px">3 more glasses to reach your goal</div>
+          </div>
+        </div>
+
+        <!-- Period Tracker -->
+        <div class="wellness-card">
+          <div class="wellness-card-title">🌸 Cycle Tracker</div>
+          <div class="period-info">
+            <div class="period-days" id="daysUntilPeriod">12</div>
+            <div class="period-label">days until next period</div>
+            <div class="period-date" id="nextPeriodDate">Expected: July 3, 2025</div>
+          </div>
+          <div class="cycle-dots" id="cycleDots"></div>
+          <div style="margin-top:14px;display:flex;gap:16px;justify-content:center;font-size:11px;color:var(--text3)">
+            <span>🩷 Period</span><span style="color:var(--cyan)">🔵 Fertile</span><span style="color:var(--yellow)">🟡 Today</span>
+          </div>
+        </div>
+
+        <!-- Mood History -->
+        <div class="wellness-card">
+          <div class="wellness-card-title">📊 Mood History</div>
+          <canvas id="moodChart" height="140"></canvas>
+        </div>
+      </div>
+
+      <!-- Period Settings -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-title">Cycle Settings</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Last Period Date</label>
+            <input type="date" class="form-control" id="lastPeriodDate" value="2025-06-03" onchange="updateCycle()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cycle Length (days)</label>
+            <input type="number" class="form-control" id="cycleLength" value="28" min="21" max="35" onchange="updateCycle()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== READING ===== -->
+    <div class="page" id="page-reading">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="page-title">Reading Tracker</div>
+            <div class="page-sub">Track your reading journey</div>
+          </div>
+          <button class="btn-primary" onclick="openModal('book')">+ Add Book</button>
+        </div>
+      </div>
+      <div class="reading-stats">
+        <div class="kpi-card purple">
+          <div class="kpi-label">Currently Reading</div>
+          <div class="kpi-val" style="font-size:24px" id="readingCount">0</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-label">Completed</div>
+          <div class="kpi-val" style="font-size:24px" id="doneCount">0</div>
+        </div>
+        <div class="kpi-card yellow">
+          <div class="kpi-label">Wishlist</div>
+          <div class="kpi-val" style="font-size:24px" id="wishCount">0</div>
+        </div>
+        <div class="kpi-card cyan">
+          <div class="kpi-label">Total Books</div>
+          <div class="kpi-val" style="font-size:24px" id="totalBooks">0</div>
+        </div>
+      </div>
+
+      <div class="tabs-row">
+        <button class="tab-btn active" onclick="switchReadTab('all', this)">All</button>
+        <button class="tab-btn" onclick="switchReadTab('reading', this)">Reading</button>
+        <button class="tab-btn" onclick="switchReadTab('done', this)">Completed</button>
+        <button class="tab-btn" onclick="switchReadTab('wish', this)">Wishlist</button>
+      </div>
+
+      <div class="books-grid" id="booksContainer"></div>
+
+      <!-- Badges -->
+      <div style="margin-top:28px">
+        <div style="font-size:16px;font-weight:700;margin-bottom:16px">🏆 Achievements</div>
+        <div class="badges-row">
+          <div class="badge-item earned">
+            <div class="badge-emoji">🌟</div>
+            <div><div class="badge-name">3-Day Starter</div><div class="badge-desc">Read for 3 consecutive days</div></div>
+          </div>
+          <div class="badge-item earned">
+            <div class="badge-emoji">🔥</div>
+            <div><div class="badge-name">7-Day Achiever</div><div class="badge-desc">Week-long reading streak</div></div>
+          </div>
+          <div class="badge-item locked">
+            <div class="badge-emoji">👑</div>
+            <div><div class="badge-name">30-Day Master</div><div class="badge-desc">Month-long reading streak</div></div>
+          </div>
+          <div class="badge-item locked">
+            <div class="badge-emoji">📚</div>
+            <div><div class="badge-name">Bookworm</div><div class="badge-desc">Complete 10 books</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SETTINGS ===== -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div class="page-title">Settings</div>
+        <div class="page-sub">Customize your LifeSync experience</div>
+      </div>
+
+      <div class="chart-card" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px">
+          <div class="avatar" style="width:64px;height:64px;font-size:24px">A</div>
+          <div>
+            <div style="font-size:20px;font-weight:700">Shruti</div>
+            <div style="color:var(--text3);font-size:14px">CSE – Cyber Security | CGC Mohali</div>
+            <div style="color:var(--text3);font-size:13px">Roll: 2338585</div>
+          </div>
+          <button class="btn-secondary" style="margin-left:auto">Edit Profile</button>
+        </div>
+        <div class="prod-score-card" style="background:var(--card2);border:none;margin-bottom:0;padding:20px">
+          <div style="margin-bottom:10px;font-weight:700;font-size:15px">Productivity Score</div>
+          <div class="prod-score-num" style="position:relative;font-size:42px;font-family:'Poppins',sans-serif;font-weight:800;color:var(--accent2)">74</div>
+          <div style="color:var(--text3);font-size:13px">Excellent — Keep going!</div>
+          <div class="prod-breakdown">
+            <div class="prod-item"><div class="prod-item-val" style="color:var(--green)">62%</div><div class="prod-item-label">Tasks</div></div>
+            <div class="prod-item"><div class="prod-item-val" style="color:var(--cyan)">60%</div><div class="prod-item-label">Study</div></div>
+            <div class="prod-item"><div class="prod-item-val" style="color:var(--accent2)">70%</div><div class="prod-item-label">Reading</div></div>
+            <div class="prod-item"><div class="prod-item-val" style="color:var(--yellow)">80%</div><div class="prod-item-label">Wellness</div></div>
+            <div class="prod-item"><div class="prod-item-val" style="color:var(--green)">82%</div><div class="prod-item-label">Attend.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-bottom:20px">
+        <div class="settings-title">Appearance</div>
+        <div class="settings-row">
+          <div><div class="settings-info-label">Dark Mode</div><div class="settings-info-desc">Use dark theme across the app</div></div>
+          <div class="toggle on" id="darkModeToggle" onclick="toggleTheme()"></div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-info-label">Compact Mode</div><div class="settings-info-desc">Show more content with less spacing</div></div>
+          <div class="toggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-bottom:20px">
+        <div class="settings-title">Notifications</div>
+        <div class="settings-row">
+          <div><div class="settings-info-label">Task Reminders</div><div class="settings-info-desc">Get reminded about upcoming tasks</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-info-label">Exam Alerts</div><div class="settings-info-desc">Notifications for upcoming exams</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-info-label">Period Reminders</div><div class="settings-info-desc">Cycle and wellness reminders</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-info-label">Hydration Alerts</div><div class="settings-info-desc">Remind to drink water</div></div>
+          <div class="toggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="settings-title">Academic Info</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">University</label>
+            <input class="form-control" value="CGC University Mohali">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <input class="form-control" value="CSE – Cyber Security">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Roll Number</label>
+            <input class="form-control" value="2338585">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Semester</label>
+            <input class="form-control" value="5th Semester">
+          </div>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:10px">
+          <button class="btn-primary">Save Changes</button>
+          <button class="btn-secondary">Reset Data</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODALS -->
+<!-- Task Modal -->
+<div class="modal-overlay" id="modal-task">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="taskModalTitle">Add New Task</div>
+      <button class="modal-close" onclick="closeModal('task')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Task Name *</label>
+      <input class="form-control" id="taskName" placeholder="e.g. Complete DBMS assignment">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Priority</label>
+        <select class="form-control" id="taskPriority">
+          <option value="low">🟢 Low</option>
+          <option value="medium" selected>🟡 Medium</option>
+          <option value="high">🔴 High</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Due Date</label>
+        <input type="date" class="form-control" id="taskDue">
+      </div>
+    </div>
+    <input type="hidden" id="editingTaskId">
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('task')">Cancel</button>
+      <button class="btn-primary" onclick="saveTask()">Save Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assignment Modal -->
+<div class="modal-overlay" id="modal-assign">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Assignment</div>
+      <button class="modal-close" onclick="closeModal('assign')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Subject *</label>
+      <select class="form-control" id="assignSubject">
+        <option>Mathematics</option>
+        <option>DBMS</option>
+        <option>Digital Forensics</option>
+        <option>Computer Networks</option>
+        <option>Web Development</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Assignment Name *</label>
+      <input class="form-control" id="assignName" placeholder="e.g. ER Diagram submission">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Deadline</label>
+        <input type="date" class="form-control" id="assignDeadline">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-control" id="assignStatus">
+          <option value="pending">Pending</option>
+          <option value="done">Done</option>
+          <option value="late">Late</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('assign')">Cancel</button>
+      <button class="btn-primary" onclick="saveAssignment()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Expense Modal -->
+<div class="modal-overlay" id="modal-expense">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Expense</div>
+      <button class="modal-close" onclick="closeModal('expense')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description *</label>
+      <input class="form-control" id="expName" placeholder="e.g. Dinner at canteen">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Amount (₹) *</label>
+        <input type="number" class="form-control" id="expAmount" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-control" id="expCategory">
+          <option value="Food">🍕 Food</option>
+          <option value="Travel">🚌 Travel</option>
+          <option value="Shopping">🛍️ Shopping</option>
+          <option value="Education">📚 Education</option>
+          <option value="Other">💡 Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <input type="date" class="form-control" id="expDate">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('expense')">Cancel</button>
+      <button class="btn-primary" onclick="saveExpense()">Add Expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- Book Modal -->
+<div class="modal-overlay" id="modal-book">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Book</div>
+      <button class="modal-close" onclick="closeModal('book')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Book Title *</label>
+      <input class="form-control" id="bookTitle" placeholder="e.g. Deep Work">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Author</label>
+      <input class="form-control" id="bookAuthor" placeholder="e.g. Cal Newport">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-control" id="bookStatus">
+          <option value="reading">Currently Reading</option>
+          <option value="done">Completed</option>
+          <option value="wish">Wishlist</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Progress (%)</label>
+        <input type="number" class="form-control" id="bookProgress" placeholder="0" min="0" max="100">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Emoji Cover</label>
+      <input class="form-control" id="bookEmoji" placeholder="📗" maxlength="4">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('book')">Cancel</button>
+      <button class="btn-primary" onclick="saveBook()">Add Book</button>
+    </div>
+  </div>
+</div>
+
+<!-- Note Modal -->
+<div class="modal-overlay" id="modal-note">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">New Note</div>
+      <button class="modal-close" onclick="closeModal('note')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Title *</label>
+      <input class="form-control" id="noteTitle" placeholder="Note title">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-control" id="noteCategory">
+        <option>DBMS</option>
+        <option>Mathematics</option>
+        <option>Forensics</option>
+        <option>Networks</option>
+        <option>Web Dev</option>
+        <option>General</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Content</label>
+      <textarea class="form-control" id="noteContent" rows="4" placeholder="Write your note here..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('note')">Cancel</button>
+      <button class="btn-primary" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast hidden" id="toast">
+  <span id="toastMsg">✅ Done!</span>
+</div>
+
+<script>
+// ==================== DATA ====================
+let tasks = [
+  { id: 1, name: 'Complete DBMS ER Diagram', priority: 'high', due: '2025-06-20', done: false },
+  { id: 2, name: 'Study Chapter 3 – Networks', priority: 'medium', due: '2025-06-18', done: true },
+  { id: 3, name: 'Submit Web Dev project', priority: 'high', due: '2025-06-25', done: false },
+  { id: 4, name: 'Read Atomic Habits (Ch 5)', priority: 'low', due: '2025-06-19', done: true },
+  { id: 5, name: 'Forensics lab report', priority: 'medium', due: '2025-06-21', done: true },
+  { id: 6, name: 'Math assignment – Integration', priority: 'high', due: '2025-06-17', done: false },
+  { id: 7, name: 'Update portfolio on GitHub', priority: 'low', due: '2025-06-22', done: true },
+  { id: 8, name: 'Revise SQL queries', priority: 'medium', due: '2025-06-23', done: true },
+];
+let taskIdCounter = 9;
+
+let assignments = [
+  { id: 1, subject: 'DBMS', name: 'ER Diagram – Student DB', deadline: '2025-06-20', status: 'pending' },
+  { id: 2, subject: 'Mathematics', name: 'Integration Problems Set', deadline: '2025-06-17', status: 'pending' },
+  { id: 3, subject: 'Web Development', name: 'LifeSync Frontend', deadline: '2025-06-25', status: 'done' },
+  { id: 4, subject: 'Digital Forensics', name: 'Autopsy Lab Report', deadline: '2025-06-10', status: 'late' },
+  { id: 5, subject: 'Computer Networks', name: 'OSI Model Presentation', deadline: '2025-06-15', status: 'done' },
+];
+let assignIdCounter = 6;
+
+let expenses = [
+  { id: 1, name: 'Canteen lunch', category: 'Food', amount: 120, date: '2025-06-14' },
+  { id: 2, name: 'Bus pass recharge', category: 'Travel', amount: 400, date: '2025-06-13' },
+  { id: 3, name: 'Textbook – Networks', category: 'Education', amount: 650, date: '2025-06-12' },
+  { id: 4, name: 'Dinner + snacks', category: 'Food', amount: 180, date: '2025-06-12' },
+  { id: 5, name: 'T-shirt shopping', category: 'Shopping', amount: 799, date: '2025-06-10' },
+  { id: 6, name: 'Breakfast', category: 'Food', amount: 80, date: '2025-06-14' },
+];
+let expIdCounter = 7;
+
+let books = [
+  { id: 1, title: 'Atomic Habits', author: 'James Clear', status: 'reading', progress: 70, emoji: '📗' },
+  { id: 2, title: 'Deep Work', author: 'Cal Newport', status: 'done', progress: 100, emoji: '📘' },
+  { id: 3, title: 'The Psychology of Money', author: 'Morgan Housel', status: 'wish', progress: 0, emoji: '📙' },
+  { id: 4, title: 'Clean Code', author: 'Robert C. Martin', status: 'reading', progress: 35, emoji: '📕' },
+];
+let bookIdCounter = 5;
+
+let notes = [
+  { id: 1, title: 'SQL Joins Cheat Sheet', category: 'DBMS', content: 'INNER JOIN returns matching rows. LEFT JOIN keeps all left rows. Use ON for conditions.', date: 'Jun 12' },
+  { id: 2, title: 'Forensic Tools Overview', category: 'Forensics', content: 'Autopsy: file carving, registry analysis, hash verification. FTK Imager for disk imaging.', date: 'Jun 10' },
+  { id: 3, title: 'OSI Model Layers', category: 'Networks', content: '7 layers: Physical, Data Link, Network, Transport, Session, Presentation, Application.', date: 'Jun 8' },
+];
+let noteIdCounter = 4;
+
+let currentFilter = 'all';
+let currentReadFilter = 'all';
+let waterGlasses = 5;
+
+// ==================== NAVIGATION ====================
+function navigate(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (btn) btn.classList.add('active');
+  closeSidebar();
+
+  if (page === 'todo') renderTasks();
+  if (page === 'study') renderAssignments();
+  if (page === 'expenses') { renderTransactions(); initExpCharts(); }
+  if (page === 'reading') renderBooks();
+  if (page === 'wellness') { initMoodChart(); updateCycle(); renderWater(); }
+  if (page === 'dashboard') renderDashTasks();
+}
+
+// ==================== SIDEBAR ====================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ==================== THEME ====================
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeToggleBtn').textContent = isDark ? '🌙 Light' : '🌙 Dark';
+  document.getElementById('darkModeToggle').classList.toggle('on', !isDark);
+  setTimeout(() => { if(weeklyChart) { weeklyChart.destroy(); initWeeklyChart(); } }, 100);
+}
+
+// ==================== TIME ====================
+function updateTime() {
+  const now = new Date();
+  document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+}
+setInterval(updateTime, 1000); updateTime();
+
+// ==================== TOAST ====================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 2500);
+}
+
+// ==================== MODALS ====================
+function openModal(type) {
+  document.getElementById('modal-' + type).classList.add('open');
+  if (type === 'task') {
+    document.getElementById('taskModalTitle').textContent = 'Add New Task';
+    document.getElementById('taskName').value = '';
+    document.getElementById('taskPriority').value = 'medium';
+    document.getElementById('taskDue').value = '';
+    document.getElementById('editingTaskId').value = '';
+  }
+  if (type === 'expense') {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('expDate').value = today;
+  }
+}
+function closeModal(type) {
+  document.getElementById('modal-' + type).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ==================== TASKS ====================
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks();
+}
+
+function renderTasks() {
+  const search = (document.getElementById('taskSearch')?.value || '').toLowerCase();
+  let filtered = tasks.filter(t => t.name.toLowerCase().includes(search));
+  if (currentFilter === 'pending') filtered = filtered.filter(t => !t.done);
+  if (currentFilter === 'done') filtered = filtered.filter(t => t.done);
+  if (currentFilter === 'high') filtered = filtered.filter(t => t.priority === 'high');
+
+  const c = document.getElementById('tasksContainer');
+  if (!c) return;
+  if (!filtered.length) {
+    c.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No tasks found</div><div class="empty-sub">Add a new task to get started</div></div>`;
+    return;
+  }
+  c.innerHTML = filtered.map(t => `
+    <div class="task-card" id="tc-${t.id}">
+      <div class="task-checkbox ${t.done ? 'done' : ''}" onclick="toggleTask(${t.id})">${t.done ? '✓' : ''}</div>
+      <div class="task-info">
+        <div class="task-name ${t.done ? 'done' : ''}">${t.name}</div>
+        <div class="task-meta">
+          <span class="priority-tag ${t.priority}">${t.priority.charAt(0).toUpperCase() + t.priority.slice(1)}</span>
+          ${t.due ? `<span class="task-due">📅 ${formatDate(t.due)}</span>` : ''}
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="task-action-btn" onclick="editTask(${t.id})" title="Edit">✏️</button>
+        <button class="task-action-btn" onclick="deleteTask(${t.id})" title="Delete">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (t) { t.done = !t.done; renderTasks(); renderDashTasks(); }
+}
+
+function editTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('taskModalTitle').textContent = 'Edit Task';
+  document.getElementById('taskName').value = t.name;
+  document.getElementById('taskPriority').value = t.priority;
+  document.getElementById('taskDue').value = t.due;
+  document.getElementById('editingTaskId').value = id;
+  document.getElementById('modal-task').classList.add('open');
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  renderTasks(); renderDashTasks();
+  showToast('🗑️ Task deleted');
+}
+
+function saveTask() {
+  const name = document.getElementById('taskName').value.trim();
+  if (!name) { showToast('⚠️ Task name required'); return; }
+  const editId = parseInt(document.getElementById('editingTaskId').value);
+  if (editId) {
+    const t = tasks.find(x => x.id === editId);
+    t.name = name;
+    t.priority = document.getElementById('taskPriority').value;
+    t.due = document.getElementById('taskDue').value;
+    showToast('✅ Task updated');
+  } else {
+    tasks.unshift({ id: taskIdCounter++, name, priority: document.getElementById('taskPriority').value, due: document.getElementById('taskDue').value, done: false });
+    showToast('✅ Task added');
+  }
+  closeModal('task'); renderTasks(); renderDashTasks();
+}
+
+function renderDashTasks() {
+  const c = document.getElementById('dashTasks');
+  if (!c) return;
+  const today = tasks.slice(0, 5);
+  c.innerHTML = today.map(t => `
+    <div class="task-mini">
+      <div class="task-mini-check ${t.done ? 'done' : ''}" onclick="toggleTask(${t.id})">${t.done ? '✓' : ''}</div>
+      <div class="priority-dot ${t.priority}"></div>
+      <div class="task-mini-info">
+        <div class="task-mini-name ${t.done ? 'done' : ''}">${t.name}</div>
+        ${t.due ? `<div class="task-mini-due">${formatDate(t.due)}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==================== ASSIGNMENTS ====================
+const subjectColors = { Mathematics: '#34d399', DBMS: '#7c6af7', 'Digital Forensics': '#22d3ee', 'Computer Networks': '#f472b6', 'Web Development': '#fbbf24' };
+
+function renderAssignments() {
+  const c = document.getElementById('assignmentsContainer');
+  if (!c) return;
+  if (!assignments.length) { c.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><div class="empty-title">No assignments</div></div>`; return; }
+  c.innerHTML = assignments.map(a => `
+    <div class="assignment-card">
+      <div class="subject-badge" style="background:${subjectColors[a.subject] || '#7c6af7'}22;color:${subjectColors[a.subject] || '#7c6af7'}">${a.subject}</div>
+      <div class="asgn-info">
+        <div class="asgn-name">${a.name}</div>
+        <div class="asgn-deadline">📅 ${formatDate(a.deadline)}</div>
+      </div>
+      <span class="status-badge ${a.status}">${a.status.charAt(0).toUpperCase() + a.status.slice(1)}</span>
+      <button class="task-action-btn" onclick="deleteAssignment(${a.id})">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function saveAssignment() {
+  const name = document.getElementById('assignName').value.trim();
+  if (!name) { showToast('⚠️ Name required'); return; }
+  assignments.unshift({ id: assignIdCounter++, subject: document.getElementById('assignSubject').value, name, deadline: document.getElementById('assignDeadline').value, status: document.getElementById('assignStatus').value });
+  closeModal('assign'); renderAssignments(); showToast('✅ Assignment added');
+}
+
+function deleteAssignment(id) {
+  assignments = assignments.filter(a => a.id !== id);
+  renderAssignments(); showToast('🗑️ Deleted');
+}
+
+// ==================== STUDY TABS ====================
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#page-study .tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+  if (tab === 'assignments') renderAssignments();
+  if (tab === 'notes') renderNotes();
+}
+
+// ==================== NOTES ====================
+function renderNotes() {
+  const c = document.getElementById('notesContainer');
+  if (!c) return;
+  if (!notes.length) { c.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><div class="empty-title">No notes yet</div></div>`; return; }
+  c.innerHTML = notes.map(n => `
+    <div class="note-card">
+      <span class="note-tag">${n.category}</span>
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div class="note-title">${n.title}</div>
+        <button class="task-action-btn" onclick="deleteNote(${n.id})" style="flex-shrink:0">🗑️</button>
+      </div>
+      <div class="note-preview">${n.content}</div>
+      <div class="note-date">${n.date}</div>
+    </div>
+  `).join('');
+}
+
+function saveNote() {
+  const title = document.getElementById('noteTitle').value.trim();
+  if (!title) { showToast('⚠️ Title required'); return; }
+  const now = new Date();
+  notes.unshift({ id: noteIdCounter++, title, category: document.getElementById('noteCategory').value, content: document.getElementById('noteContent').value, date: now.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) });
+  closeModal('note'); renderNotes(); showToast('📝 Note saved');
+}
+
+function deleteNote(id) {
+  notes = notes.filter(n => n.id !== id);
+  renderNotes(); showToast('🗑️ Deleted');
+}
+
+// ==================== EXPENSES ====================
+const catEmojis = { Food: '🍕', Travel: '🚌', Shopping: '🛍️', Education: '📚', Other: '💡' };
+const catColors = { Food: '#f87171', Travel: '#fbbf24', Shopping: '#f472b6', Education: '#7c6af7', Other: '#22d3ee' };
+
+function renderTransactions() {
+  const c = document.getElementById('transactionsContainer');
+  if (!c) return;
+  document.getElementById('txnCount').textContent = expenses.length;
+  document.getElementById('txnCountBadge').textContent = expenses.length + ' records';
+  if (!expenses.length) { c.innerHTML = `<div class="empty-state"><div class="empty-icon">💸</div><div class="empty-title">No expenses yet</div></div>`; return; }
+  c.innerHTML = expenses.map(e => `
+    <div class="txn">
+      <div class="txn-icon" style="background:${catColors[e.category]}22">${catEmojis[e.category]}</div>
+      <div class="txn-info">
+        <div class="txn-name">${e.name}</div>
+        <div class="txn-cat">${e.category}</div>
+      </div>
+      <div class="txn-date">${formatDate(e.date)}</div>
+      <div class="txn-amount expense">-₹${e.amount}</div>
+      <button class="task-action-btn" onclick="deleteExpense(${e.id})">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function saveExpense() {
+  const name = document.getElementById('expName').value.trim();
+  const amount = parseFloat(document.getElementById('expAmount').value);
+  if (!name || !amount) { showToast('⚠️ Fill in all fields'); return; }
+  expenses.unshift({ id: expIdCounter++, name, category: document.getElementById('expCategory').value, amount, date: document.getElementById('expDate').value });
+  closeModal('expense'); renderTransactions(); updateExpCharts(); showToast('💰 Expense added');
+}
+
+function deleteExpense(id) {
+  expenses = expenses.filter(e => e.id !== id);
+  renderTransactions(); updateExpCharts(); showToast('🗑️ Deleted');
+}
+
+// ==================== BOOKS ====================
+function switchReadTab(f, btn) {
+  currentReadFilter = f;
+  document.querySelectorAll('#page-reading .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBooks();
+}
+
+function renderBooks() {
+  const c = document.getElementById('booksContainer');
+  if (!c) return;
+  let filtered = books;
+  if (currentReadFilter !== 'all') filtered = books.filter(b => b.status === currentReadFilter);
+  document.getElementById('readingCount').textContent = books.filter(b => b.status === 'reading').length;
+  document.getElementById('doneCount').textContent = books.filter(b => b.status === 'done').length;
+  document.getElementById('wishCount').textContent = books.filter(b => b.status === 'wish').length;
+  document.getElementById('totalBooks').textContent = books.length;
+  if (!filtered.length) { c.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📚</div><div class="empty-title">No books here</div></div>`; return; }
+  const coverColors = ['#1a1e35','#131629','#1f2440','#0d1525'];
+  c.innerHTML = filtered.map((b, i) => `
+    <div class="book-card">
+      <div class="book-cover" style="background:${coverColors[i % coverColors.length]}">
+        <span>${b.emoji || '📗'}</span>
+        <span class="book-status-label ${b.status}">${b.status === 'reading' ? 'Reading' : b.status === 'done' ? 'Done' : 'Wishlist'}</span>
+      </div>
+      <div class="book-body">
+        <div class="book-title">${b.title}</div>
+        <div class="book-author">by ${b.author}</div>
+        <div class="book-progress-row">
+          <div class="book-progress-bar"><div class="book-progress-fill" style="width:${b.progress}%"></div></div>
+          <div class="book-pct">${b.progress}%</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn-secondary" style="font-size:11px;padding:5px 10px;flex:1" onclick="updateBookProgress(${b.id})">Update</button>
+          <button class="task-action-btn" onclick="deleteBook(${b.id})">🗑️</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveBook() {
+  const title = document.getElementById('bookTitle').value.trim();
+  if (!title) { showToast('⚠️ Title required'); return; }
+  books.unshift({ id: bookIdCounter++, title, author: document.getElementById('bookAuthor').value || 'Unknown', status: document.getElementById('bookStatus').value, progress: parseInt(document.getElementById('bookProgress').value) || 0, emoji: document.getElementById('bookEmoji').value || '📗' });
+  closeModal('book'); renderBooks(); showToast('📚 Book added');
+}
+
+function deleteBook(id) {
+  books = books.filter(b => b.id !== id);
+  renderBooks(); showToast('🗑️ Deleted');
+}
+
+function updateBookProgress(id) {
+  const b = books.find(x => x.id === id);
+  const p = prompt('Update progress (0-100):', b.progress);
+  if (p !== null && !isNaN(parseInt(p))) { b.progress = Math.min(100, Math.max(0, parseInt(p))); if (b.progress === 100) b.status = 'done'; renderBooks(); showToast('📖 Progress updated'); }
+}
+
+// ==================== WELLNESS ====================
+function selectMood(el, mood) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  showToast(`😊 Mood set to ${mood}`);
+}
+
+function renderWater() {
+  const c = document.getElementById('waterCups');
+  if (!c) return;
+  let html = '';
+  for (let i = 0; i < 8; i++) {
+    html += `<div class="water-cup ${i < waterGlasses ? 'filled' : ''}" onclick="toggleWater(${i})">💧</div>`;
+  }
+  c.innerHTML = html;
+  document.getElementById('waterCount').textContent = waterGlasses;
+  const pct = (waterGlasses / 8) * 100;
+  document.getElementById('waterBar').style.width = pct + '%';
+}
+
+function toggleWater(i) {
+  waterGlasses = i + 1;
+  renderWater();
+  showToast(`💧 ${waterGlasses}/8 glasses logged`);
+}
+
+function updateCycle() {
+  const lastDate = new Date(document.getElementById('lastPeriodDate')?.value || '2025-06-03');
+  const cycleLen = parseInt(document.getElementById('cycleLength')?.value || 28);
+  const nextDate = new Date(lastDate);
+  nextDate.setDate(nextDate.getDate() + cycleLen);
+  const today = new Date();
+  const daysLeft = Math.round((nextDate - today) / (1000 * 60 * 60 * 24));
+  const el = document.getElementById('daysUntilPeriod');
+  const el2 = document.getElementById('nextPeriodDate');
+  if (el) el.textContent = Math.max(0, daysLeft);
+  if (el2) el2.textContent = 'Expected: ' + nextDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  renderCycleDots(lastDate, cycleLen, today);
+}
+
+function renderCycleDots(lastDate, cycleLen, today) {
+  const c = document.getElementById('cycleDots');
+  if (!c) return;
+  let html = '';
+  for (let i = 0; i < cycleLen; i++) {
+    const d = new Date(lastDate); d.setDate(d.getDate() + i);
+    let cls = '';
+    if (i < 5) cls = 'period';
+    else if (i >= 11 && i <= 16) cls = 'fertile';
+    if (d.toDateString() === today.toDateString()) cls = 'today';
+    html += `<div class="cycle-dot ${cls}" title="Day ${i+1}"></div>`;
+  }
+  c.innerHTML = html;
+}
+
+// ==================== CHARTS ====================
+let weeklyChart, expPieSmall, expPieMain, monthlyExpChart, moodChart;
+
+const chartDefaults = () => ({
+  color: getComputedStyle(document.documentElement).getPropertyValue('--text2').trim(),
+  grid: getComputedStyle(document.documentElement).getPropertyValue('--border').trim(),
+});
+
+function initWeeklyChart() {
+  const ctx = document.getElementById('weeklyChart');
+  if (!ctx) return;
+  const d = chartDefaults();
+  weeklyChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [
+        { label: 'Tasks Done', data: [3, 5, 2, 6, 4, 1, 3], backgroundColor: 'rgba(124,106,247,0.7)', borderRadius: 6, borderSkipped: false },
+        { label: 'Study Hours', data: [2, 4, 3, 5, 2, 1, 0], backgroundColor: 'rgba(34,211,238,0.5)', borderRadius: 6, borderSkipped: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { labels: { color: d.color, font: { family: 'Inter' } } } },
+      scales: {
+        x: { ticks: { color: d.color }, grid: { color: d.grid } },
+        y: { ticks: { color: d.color }, grid: { color: d.grid }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+function initExpCharts() {
+  initExpPieSmall();
+  initMonthlyExpChart();
+  initExpPieMain();
+}
+
+function initExpPieSmall() {
+  const ctx = document.getElementById('expensePieSmall');
+  if (!ctx) return;
+  if (expPieSmall) expPieSmall.destroy();
+  const data = getCatData();
+  expPieSmall = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: data.labels, datasets: [{ data: data.values, backgroundColor: data.colors, borderWidth: 0 }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: chartDefaults().color, font: { family: 'Inter', size: 11 }, boxWidth: 12, padding: 8 } } }, cutout: '65%' }
+  });
+}
+
+function initExpPieMain() {
+  const ctx = document.getElementById('expPieChart');
+  if (!ctx) return;
+  if (expPieMain) expPieMain.destroy();
+  const data = getCatData();
+  expPieMain = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: data.labels, datasets: [{ data: data.values, backgroundColor: data.colors, borderWidth: 0 }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: chartDefaults().color, font: { family: 'Inter', size: 11 }, boxWidth: 12, padding: 8 } } }, cutout: '60%' }
+  });
+}
+
+function getCatData() {
+  const totals = {};
+  expenses.forEach(e => { totals[e.category] = (totals[e.category] || 0) + e.amount; });
+  const labels = Object.keys(totals);
+  const values = Object.values(totals);
+  const colors = labels.map(l => catColors[l] || '#7c6af7');
+  return { labels, values, colors };
+}
+
+function initMonthlyExpChart() {
+  const ctx = document.getElementById('monthlyExpChart');
+  if (!ctx) return;
+  if (monthlyExpChart) monthlyExpChart.destroy();
+  const d = chartDefaults();
+  monthlyExpChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{ label: 'Spending (₹)', data: [3200, 4100, 3800, 5200, 4800, 4230], borderColor: '#7c6af7', backgroundColor: 'rgba(124,106,247,0.1)', fill: true, tension: 0.4, pointBackgroundColor: '#7c6af7', pointRadius: 4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { color: d.color }, grid: { color: d.grid } }, y: { ticks: { color: d.color, callback: v => '₹' + v }, grid: { color: d.grid }, beginAtZero: true } }
+    }
+  });
+}
+
+function updateExpCharts() {
+  renderTransactions();
+  if (expPieSmall) expPieSmall.destroy();
+  if (expPieMain) expPieMain.destroy();
+  initExpPieSmall(); initExpPieMain();
+}
+
+function initMoodChart() {
+  const ctx = document.getElementById('moodChart');
+  if (!ctx) return;
+  if (moodChart) moodChart.destroy();
+  const d = chartDefaults();
+  moodChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{ label: 'Mood', data: [4, 3, 2, 4, 5, 4, 4], borderColor: '#f472b6', backgroundColor: 'rgba(244,114,182,0.1)', fill: true, tension: 0.4, pointBackgroundColor: '#f472b6', pointRadius: 4 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: d.color, font: { size: 11 } }, grid: { color: d.grid } },
+        y: { ticks: { color: d.color, callback: v => ['','😢','😰','😌','😊','🤩'][v] || v, font: { size: 14 } }, grid: { color: d.grid }, min: 1, max: 5 }
+      }
+    }
+  });
+}
+
+// ==================== HELPERS ====================
+function formatDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ==================== INIT ====================
+window.addEventListener('DOMContentLoaded', () => {
+  renderDashTasks();
+  initWeeklyChart();
+  initExpPieSmall();
+  updateCycle();
+  // Set today's date as default for expense
+  const today = new Date().toISOString().split('T')[0];
+  if (document.getElementById('expDate')) document.getElementById('expDate').value = today;
+  if (document.getElementById('taskDue')) document.getElementById('taskDue').value = today;
+});
+</script>
+</body>
+</html>
